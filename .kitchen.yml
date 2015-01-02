@@ -4,9 +4,7 @@ driver:
 
 provisioner:
   name: chef_solo
-  require_chef_omnibus: latest
-
-provisioner:
+  require_chef_omnibus: 11.16.4
   data_path: test/fixtures
 
 platforms:
@@ -74,6 +72,7 @@ suites:
   - recipe[apache2_test::basic_web_app]
   - recipe[apache2_test::broken_conf]
   - recipe[apache2_test::modules]
+  - recipe[apache2_test::mod_ssl]
   - recipe[apache2_test::mod_auth_basic]
   - recipe[apache2_test::mod_auth_digest]
 # - recipe[apache2_test::mod_auth_openid]
@@ -85,22 +84,55 @@ suites:
   - recipe[apache2_test::mod_cgi]
 # - recipe[apache2_test::mod_dav_svn]
   - recipe[apache2_test::mod_expires]
-  - recipe[apache2_test::mod_perl]
-  - recipe[apache2_test::mod_php5]
-# - recipe[apache2_test::mod_proxy_ajp]
-  - recipe[apache2_test::mod_python]
-  - recipe[apache2_test::mod_ssl]
   - recipe[apache2_test::mod_status_remote]
-- name: worker
+- name: prefork
   includes: [
-    'centos-7.0',
+    'centos-6.5',
     'ubuntu-14.04'
   ]
   attributes:
     machine_fqdn: working.computers.biz
     machine_fqdn_as_hostname: true
     apache:
+      mpm: prefork
+  run_list:
+  - recipe[fqdn]
+  - recipe[apache2_test::setup]
+  - recipe[apache2_test::default]
+  - recipe[apache2_test::broken_conf]
+  - recipe[apache2_test::modules]
+  - recipe[apache2_test::mod_cgi]
+  - recipe[apache2_test::mod_perl]
+  - recipe[apache2_test::mod_php5]
+# - recipe[apache2_test::mod_proxy_ajp]
+  - recipe[apache2_test::mod_python]
+  - recipe[apache2_test::mod_ssl]
+- name: worker
+  includes: [
+    'centos-7.0',
+    'ubuntu-12.04'
+  ]
+  attributes:
+    machine_fqdn: working.computers.biz
+    machine_fqdn_as_hostname: true
+    apache:
       mpm: worker
+  run_list:
+  - recipe[fqdn]
+  - recipe[apache2_test::setup]
+  - recipe[apache2_test::default]
+  - recipe[apache2_test::basic_web_app]
+  - recipe[apache2_test::broken_conf]
+  - recipe[apache2_test::modules]
+- name: event
+  includes: [
+    'ubuntu-14.04'
+  ]
+  attributes:
+    machine_fqdn: working.computers.biz
+    machine_fqdn_as_hostname: true
+    apache:
+      mpm: event
   run_list:
   - recipe[fqdn]
   - recipe[apache2_test::setup]
