@@ -19,9 +19,16 @@
 
 case node['platform_family']
 when 'rhel'
-  package 'mod_security' do
-    action :install
-    notifies :run, resources(execute: 'generate-module-list'), :immediately
+  if node['apache']['version'] == '2.4'
+    package 'mod24_security' do
+      action :install
+      notifies :run, resources(execute: 'generate-module-list'), :immediately
+    end
+  else
+    package 'mod_security' do
+      action :install
+      notifies :run, resources(execute: 'generate-module-list'), :immediately
+    end
   end
 
   file "#{node['apache']['dir']}/conf.d/mod_security.conf" do
