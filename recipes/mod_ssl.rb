@@ -23,8 +23,14 @@ end
 include_recipe 'apache2::default'
 
 if platform_family?('rhel', 'fedora', 'suse')
-  package 'mod_ssl' do
-    notifies :run, 'execute[generate-module-list]', :immediately
+  if node['apache']['version'] == '2.4'
+    package 'mod24_ssl' do
+      notifies :run, 'execute[generate-module-list]', :immediately
+    end
+  else
+    package 'mod_ssl' do
+      notifies :run, 'execute[generate-module-list]', :immediately
+    end
   end
 
   file "#{node['apache']['dir']}/conf.d/ssl.conf" do
