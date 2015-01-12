@@ -5,8 +5,8 @@ LoadModule security2_module modules/mod_security2.so
 </IfModule>
 <IfModule mod_security2.c>
     # ModSecurity Core Rules Set configuration
-        Include modsecurity.d/*.conf
-        Include modsecurity.d/activated_rules/*.conf
+    IncludeOptional modsecurity.d/*.conf
+    IncludeOptional modsecurity.d/activated_rules/*.conf
 
     # Default recommended configuration
     SecRuleEngine On
